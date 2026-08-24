@@ -38,6 +38,7 @@ FALLBACK_DOCUMENTS = [
     "<p a='unterminated>",
     "<!-- invalid--comment -->",
     "<p>&#0;</p>",
+    "<p>&#11;</p>",
     b"<meta charset=utf-8><p>\xc3\xa9</p>",
 ]
 
@@ -104,6 +105,13 @@ def test_namespace_option_matches_html5lib():
 def test_duplicate_attribute_error_and_first_value_match():
     source = "<p A=first a=second>x</p>"
     assert list(HTMLTokenizer(source)) == list(html5lib._tokenizer.HTMLTokenizer(source))
+
+
+def test_fast_named_and_numeric_entity_decoding_matches_html5lib():
+    source = "<p>&NotEqualTilde; &#x1F642; &#65;</p>"
+    tokenizer = HTMLTokenizer(source)
+    assert list(tokenizer) == list(html5lib._tokenizer.HTMLTokenizer(source))
+    assert tokenizer.used_mojo
 
 
 def test_file_like_input_uses_compatible_fallback():

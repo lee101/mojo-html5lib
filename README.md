@@ -79,13 +79,15 @@ generated corpus was 1.19 MB of attribute- and entity-bearing article markup, pr
 
 | operation | mojo-html5lib | html5lib 1.1 | ratio |
 | --- | ---: | ---: | ---: |
-| `HTMLTokenizer` | 257.9 ms | 1083.5 ms | 4.20x faster |
-| parse to etree | 1253.7 ms | 2064.3 ms | 1.65x faster |
-| Mojo lexical scan only | 13.4 ms | n/a | n/a |
+| `HTMLTokenizer` | 224.4 ms | 793.2 ms | 3.54x faster |
+| parse to etree | 701.8 ms | 1656.3 ms | 2.36x faster |
+| Mojo lexical scan only | 14.2 ms | n/a | n/a |
 
 The scanner itself is much faster than end-to-end tokenization. Python dictionary
 construction and HTML5 tree mutation dominate the remaining time, so the full parser
-speedup is intentionally reported rather than extrapolated from the kernel.
+speedup is intentionally reported rather than extrapolated from the kernel. Validated
+named entities use the HTML5 entity table directly, and validated numeric entities are
+converted directly to their code point instead of re-entering a general HTML unescaper.
 
 Contiguous text and quoted-attribute searches use native-width `UInt8` SIMD loads with
 an unaligned-safe load and a scalar remainder loop. Parsing remains serial: token

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from html import unescape
 from html.entities import html5 as html_entities
 import re
 
@@ -34,6 +33,7 @@ def _decode_entity(raw: str) -> str | None:
             return None
         if (
             codepoint == 0
+            or codepoint == 11
             or 0xD800 <= codepoint <= 0xDFFF
             or codepoint > 0x10FFFF
             or 0x0001 <= codepoint <= 0x0008
@@ -43,12 +43,8 @@ def _decode_entity(raw: str) -> str | None:
             or codepoint & 0xFFFF in (0xFFFE, 0xFFFF)
         ):
             return None
-    elif raw[1:] not in html_entities:
-        return None
-    decoded = unescape(raw)
-    if decoded == raw:
-        return None
-    return decoded
+        return chr(codepoint)
+    return html_entities.get(raw[1:])
 
 
 def _decode_entities(value: str) -> str | None:
